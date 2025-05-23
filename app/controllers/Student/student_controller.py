@@ -11,7 +11,7 @@ def create_student():
     course = data.get('course')
 
     if not name or not course:
-        return jsonify({"message": "Missing required fields (name, address)"}), 400
+        return jsonify({"message": "Missing required fields (name, course)"}), 400
 
     new_student = Student(name=name, course=course)
     db.session.add(new_student)
