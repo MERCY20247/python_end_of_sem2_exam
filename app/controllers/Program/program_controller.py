@@ -1,36 +1,25 @@
-from flask import request, jsonify, Blueprint
-from app.models import db, Program
 
-program_bp = Blueprint('program', __name__)
+from flask import Blueprint, request, jsonify
+from app.extensions import db
+from app.models import Program
+from app.status_codes import *
 
-# Create a new program
+program_bp = Blueprint('program', __name__, url_prefix='/programs')
+
 @program_bp.route('/', methods=['POST'])
 def create_program():
-    data = request.get_json()
-    name = data.get('name')
-    director = data.get('director')
-
-    if not name or not director:
-        return jsonify({"message": "Missing required fields (name, address)"}), 400
-
-    new_program = Program(name=name, director=director)
-    db.session.add(new_program)
+    data = request.json
+    program = Program(**data)
+    db.session.add(program)
     db.session.commit()
+    return jsonify({'message': 'Program created'}), HTTP_201_CREATED
 
-    return jsonify({"message": "Program created successfully!"}), 201
-
-
-# Update a program
 @program_bp.route('/<int:id>', methods=['PUT'])
 def update_program(id):
-    data = request.get_json()
-    program = Program.query.get(id)
-    if not program:
-        return jsonify({"message": "Program not found."}), 404
-    
-    program.name = data.get('name', program.name)
-    program.director = data.get('director', program.address)
+    data = request.json
+    program = Program.query.get_or_404(id)
+    for key, value in data.items():
+        setattr(program, key, value)
     db.session.commit()
-
-    return jsonify({"message": "Company updated successfully!"}), 200
+    return jsonify({'message': 'Program updated'}), HTTP_200_OK
 

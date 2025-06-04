@@ -1,23 +1,16 @@
-from flask import request, jsonify, Blueprint
-from app.models import db, Course, Student
 
-course_bp = Blueprint('course', __name__)
+from flask import Blueprint, request, jsonify
+from app.extensions import db
+from app.models import Course
+from app.status_codes import *
 
-# Create a new course
+course_bp = Blueprint('course', __name__, url_prefix='/courses')
+
 @course_bp.route('/', methods=['POST'])
 def create_course():
-    data = request.get_json()
-    title = data.get('title')
-    lecturer = data.get('lecturer')
-    student_id = data.get('student_id')
-
-    student = Student.query.get(student_id)
-    if not student:
-        return jsonify({"message": "Student not found."}), 404
-    
-    new_course = Course(title=title, lecturer=lecturer, student_id=student_id)
-    db.session.add(new_course)
+    data = request.json
+    course = Course(**data)
+    db.session.add(course)
     db.session.commit()
-
-    return jsonify({"message": "Course created successfully"}), 200
+    return jsonify({'message': 'Course created'}), HTTP_201_CREATED
 

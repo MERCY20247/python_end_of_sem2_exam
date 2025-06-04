@@ -1,11 +1,8 @@
+
 from flask import Blueprint
+from app.Controllers.Course.course_controller import course_bp
+from app.Controllers.Student.student_controller import student_bp
+from app.Controllers.Program.program_controller import program_bp
 
-# Define the blueprints only once
-student_bp = Blueprint('student', __name__, url_prefix='/students')
-course_bp = Blueprint('course', __name__, url_prefix='/courses')
-program_bp = Blueprint('program', __name__, url_prefix='/programs')
-
-# Import the controller files which should define routes
-from .student.controller import *
-from .course.controller import *
-from .program.controller import *
+# These are the blueprints
+__all__ = ['course_bp', 'student_bp', 'program_bp']
